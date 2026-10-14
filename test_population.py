@@ -179,3 +179,26 @@ def test_statistiques_vides() -> None:
 def test_recherche_donnees_vides() -> None:
     assert population.get_pop_commune([], "01001") is None
     assert population.stat_by_dpt({}, "01") == (None, None)
+    
+def test_lecture_csv_temporaire(tmp_path: Path) -> None:
+    chemin = tmp_path / "population_test.csv"
+    chemin.write_text(
+        "Code Officiel Département;Population totale\n"
+        "01;120.0\n"
+        "02;80.0\n",
+        encoding="utf-8",
+    )
+
+    resultat = population.read_file(str(chemin))
+
+    assert resultat == [
+        {"Code Officiel Département": "01", "Population totale": "120.0"},
+        {"Code Officiel Département": "02", "Population totale": "80.0"},
+    ]
+
+
+def test_fichier_inexistant(tmp_path: Path) -> None:
+    chemin = tmp_path / "absent.csv"
+
+    with pytest.raises(FileNotFoundError):
+        population.read_file(str(chemin))
