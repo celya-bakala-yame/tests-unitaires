@@ -40,3 +40,29 @@ def test_population_commune(
 
 def test_commune_inconnue(donnees: list[dict[str, str]]) -> None:
     assert population.get_pop_commune(donnees, "00000") is None
+    
+def test_liste_departements(donnees: list[dict[str, str]]) -> None:
+    departements = population.build_list_departements(donnees)
+
+    assert len(departements) == 99
+    assert ("15", "Cantal") in departements
+    assert departements == sorted(departements)
+    assert len(departements) == len(set(departements))
+
+
+def test_liste_communes(donnees: list[dict[str, str]]) -> None:
+    communes = population.build_list_communes(donnees)
+
+    assert len(communes) == 35836
+    assert ("02598", "Pernant") in communes
+    assert communes == sorted(communes)
+    assert len(communes) == len(set(communes))
+
+
+def test_communes_meme_code_noms_differents(
+    donnees: list[dict[str, str]],
+) -> None:
+    communes = population.build_list_communes(donnees)
+
+    assert ("14713", "Montillières-sur-Orne") in communes
+    assert ("14713", "Trois-Monts") in communes
