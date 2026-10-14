@@ -22,3 +22,16 @@ def test_split(texte: str) -> None:
 def test_split_argument_invalide(texte: str) -> None:
     with pytest.raises(TypeError):
         texte.split(2)
+    
+@pytest.mark.parametrize(
+    "entree, attendu",
+    [
+        ("python", "PYTHON"),
+        ("Bonjour", "BONJOUR"),
+        ("", ""),
+        ("123", "123"),
+        ("été", "ÉTÉ"),
+    ],
+)
+def test_upper_parametre(entree: str, attendu: str) -> None:
+    assert entree.upper() == attendu
