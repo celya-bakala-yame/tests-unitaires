@@ -66,3 +66,40 @@ def test_communes_meme_code_noms_differents(
 
     assert ("14713", "Montillières-sur-Orne") in communes
     assert ("14713", "Trois-Monts") in communes
+    
+@pytest.fixture(scope="module")
+def statistiques(
+    donnees: list[dict[str, str]],
+) -> dict[str, tuple[int, int]]:
+    return population.build_dict_departements(donnees)
+
+
+def test_nombre_departements_statistiques(
+    statistiques: dict[str, tuple[int, int]],
+) -> None:
+    assert len(statistiques) == 103
+
+
+@pytest.mark.parametrize(
+    "code, attendu",
+    [
+        ("87", (202, 383163)),
+        ("77", (514, 1433625)),
+        ("21", (713, 553151)),
+        ("53", (264, 346208)),
+        ("75", (20, 2192485)),
+        ("2A", (124, 160294)),
+    ],
+)
+def test_statistiques_departement(
+    statistiques: dict[str, tuple[int, int]],
+    code: str,
+    attendu: tuple[int, int],
+) -> None:
+    assert population.stat_by_dpt(statistiques, code) == attendu
+
+
+def test_departement_inconnu(
+    statistiques: dict[str, tuple[int, int]],
+) -> None:
+    assert population.stat_by_dpt(statistiques, "inconnu") == (None, None)
