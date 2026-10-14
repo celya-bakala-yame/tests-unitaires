@@ -103,3 +103,79 @@ def test_departement_inconnu(
     statistiques: dict[str, tuple[int, int]],
 ) -> None:
     assert population.stat_by_dpt(statistiques, "inconnu") == (None, None)
+    
+@pytest.fixture
+def petit_jeu() -> list[dict[str, str]]:
+    return [
+        {
+            "Code Officiel Département": "01",
+            "Nom Officiel Département": "Ain",
+            "Code Officiel Commune / Arrondissement Municipal": "01001",
+            "Nom Officiel Commune / Arrondissement Municipal": "Commune A",
+            "Population totale": "120.0",
+            "Année de recensement": "2018",
+        },
+        {
+            "Code Officiel Département": "01",
+            "Nom Officiel Département": "Ain",
+            "Code Officiel Commune / Arrondissement Municipal": "01001",
+            "Nom Officiel Commune / Arrondissement Municipal": "Commune A",
+            "Population totale": "100.0",
+            "Année de recensement": "2015",
+        },
+        {
+            "Code Officiel Département": "01",
+            "Nom Officiel Département": "Ain",
+            "Code Officiel Commune / Arrondissement Municipal": "01002",
+            "Nom Officiel Commune / Arrondissement Municipal": "Commune B",
+            "Population totale": "80.0",
+            "Année de recensement": "2018",
+        },
+    ]
+
+
+def test_departements_sans_doublons(
+    petit_jeu: list[dict[str, str]],
+) -> None:
+    assert population.build_list_departements(petit_jeu) == [
+        ("01", "Ain"),
+    ]
+
+
+def test_communes_sans_doublons(
+    petit_jeu: list[dict[str, str]],
+) -> None:
+    assert population.build_list_communes(petit_jeu) == [
+        ("01001", "Commune A"),
+        ("01002", "Commune B"),
+    ]
+
+
+def test_population_annee_recente(
+    petit_jeu: list[dict[str, str]],
+) -> None:
+    assert population.get_pop_commune(petit_jeu, "01001") == (
+        "Commune A", 120, "2018"
+    )
+
+
+def test_agregation_annee_recente(
+    petit_jeu: list[dict[str, str]],
+) -> None:
+    assert population.build_dict_departements(petit_jeu) == {
+        "01": (2, 200),
+    }
+
+
+def test_listes_vides() -> None:
+    assert population.build_list_departements([]) == []
+    assert population.build_list_communes([]) == []
+
+
+def test_statistiques_vides() -> None:
+    assert population.build_dict_departements([]) == {}
+
+
+def test_recherche_donnees_vides() -> None:
+    assert population.get_pop_commune([], "01001") is None
+    assert population.stat_by_dpt({}, "01") == (None, None)
